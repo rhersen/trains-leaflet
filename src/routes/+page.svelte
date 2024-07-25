@@ -8,6 +8,12 @@
 
 	export let data;
 
+	let announcements = Object.fromEntries(
+		Object.entries(Object.groupBy(data.announcements, (a) => a.AdvertisedTrainIdent)).map(
+			([train, [announcement]]) => [train, announcement]
+		)
+	);
+
 	onMount(async () => {
 		const leaflet = await import('leaflet');
 
@@ -20,7 +26,7 @@
 			const [lon, lat] = wgs84(position.Position.WGS84);
 			const marker = leaflet.marker([lat, lon]);
 			markers[position.Train.AdvertisedTrainNumber] = marker;
-			marker.addTo(map).bindPopup(position.Train.AdvertisedTrainNumber);
+			marker.addTo(map).bindPopup(popupText(position));
 		});
 
 		if (data.ssePosition) {
@@ -34,7 +40,9 @@
 
 		function addPosition(position) {
 			const [lon, lat] = wgs84(position.Position.WGS84);
-			markers[position.Train.AdvertisedTrainNumber]?.setLatLng([lat, lon]);
+			const marker = markers[position.Train.AdvertisedTrainNumber];
+			marker?.setLatLng([lat, lon]);
+			marker?.setPopupContent(popupText(position));
 		}
 	});
 
@@ -46,6 +54,18 @@
 
 		if (positionSource) positionSource.close();
 	});
+
+	function popupText(position) {
+		const announcement = announcements[position.Train.AdvertisedTrainNumber];
+		const product = announcement
+			? announcement.ProductInformation.map((p) => p.Description).join(' ') + ' '
+			: '';
+		const to = announcement
+			? '<br>mot ' + announcement.ToLocation.map((l) => l.LocationName).join()
+			: '';
+		const speed = position.Speed ? '<br>' + position.Speed + ' km/h' : '';
+		return product + position.Train.AdvertisedTrainNumber + to + speed;
+	}
 
 	function wgs84(s) {
 		return s

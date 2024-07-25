@@ -64,7 +64,7 @@ function positionQuery() {
 }
 
 function announcementQuery(idArray) {
-	const since = new Date(Date.now() - 15 * minutes).toISOString();
+	const since = new Date(Date.now() - 50 * minutes).toISOString();
 	return `
 <REQUEST>
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />

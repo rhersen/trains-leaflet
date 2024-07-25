@@ -1,5 +1,6 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
+	import { groupBy } from '$lib/groupBy.js';
 
 	let mapElement;
 	let map;
@@ -9,7 +10,7 @@
 	export let data;
 
 	let announcements = Object.fromEntries(
-		Object.entries(Object.groupBy(data.announcements, (a) => a.AdvertisedTrainIdent)).map(
+		Object.entries(groupBy(data.announcements, (a) => a.AdvertisedTrainIdent)).map(
 			([train, [announcement]]) => [train, announcement]
 		)
 	);

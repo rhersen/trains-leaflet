@@ -1,6 +1,6 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
-	import { groupBy } from '$lib/groupBy.js';
+	import groupBy from '$lib/groupBy.js';
 
 	let mapElement;
 	let map;

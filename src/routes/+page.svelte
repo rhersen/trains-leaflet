@@ -16,23 +16,23 @@
 	);
 
 	onMount(async () => {
-		const leaflet = await import('leaflet');
+		const L = await import('leaflet');
 
-		const myIcon = leaflet.icon({
+		const blueIcon = L.icon({
 			iconUrl: 'circle-blue.svg',
 			iconSize: [32, 32],
 			iconAnchor: [16, 16],
 			popupAnchor: [0, -16]
 		});
 
-		map = leaflet.map(mapElement).setView([59.34389933923258, 17.053451499025947], 9);
+		map = L.map(mapElement).setView([59.34389933923258, 17.053451499025947], 9);
 
-		leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-		leaflet.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
 		data.positions.forEach((position) => {
 			const [lon, lat] = wgs84(position.Position.WGS84);
-			const marker = leaflet.marker([lat, lon], { icon: myIcon });
+			const marker = L.marker([lat, lon], { icon: blueIcon });
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position));
 		});

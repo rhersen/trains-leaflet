@@ -18,6 +18,13 @@
 	onMount(async () => {
 		const leaflet = await import('leaflet');
 
+		const myIcon = leaflet.icon({
+			iconUrl: 'circle-blue.svg',
+			iconSize: [32, 32],
+			iconAnchor: [16, 16],
+			popupAnchor: [0, -16]
+		});
+
 		map = leaflet.map(mapElement).setView([59.34389933923258, 17.053451499025947], 9);
 
 		leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -25,7 +32,7 @@
 
 		data.positions.forEach((position) => {
 			const [lon, lat] = wgs84(position.Position.WGS84);
-			const marker = leaflet.marker([lat, lon]);
+			const marker = leaflet.marker([lat, lon], { icon: myIcon });
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position));
 		});

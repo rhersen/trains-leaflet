@@ -1,6 +1,6 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
-	import groupBy from '$lib/groupBy.js';
+	import { onDestroy, onMount } from 'svelte';
+	import { code, groupAnnouncements, popupText, wgs84 } from '$lib';
 
 	let mapElement;
 	let map;
@@ -9,11 +9,7 @@
 
 	export let data;
 
-	let announcements = Object.fromEntries(
-		Object.entries(groupBy(data.announcements, (a) => a.AdvertisedTrainIdent)).map(
-			([train, [announcement]]) => [train, announcement]
-		)
-	);
+	let announcements = groupAnnouncements(data.announcements);
 
 	onMount(async () => {
 		const L = await import('leaflet');
@@ -24,6 +20,7 @@
 			popupAnchor: [0, -16]
 		};
 		const blueIcon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
+		const greenIcon = L.icon({ ...iconSize, iconUrl: 'circle-green.svg' });
 		const greyIcon = L.icon({ ...iconSize, iconUrl: 'circle-grey.svg' });
 
 		map = L.map(mapElement).setView([59.34389933923258, 17.053451499025947], 9);
@@ -32,12 +29,11 @@
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
 		data.positions.forEach((position) => {
-			const [lon, lat] = wgs84(position.Position.WGS84);
-			const announcement = announcements[position.Train.AdvertisedTrainNumber];
-			const code = announcement ? announcement.ProductInformation.map((p) => p.Code).join(' ') : '';
-			const marker = L.marker([lat, lon], { icon: code === 'PNA014' ? blueIcon : greyIcon });
+			const marker = L.marker(wgs84(position.Position.WGS84), {
+				icon: code(position, announcements) === 'PNA014' ? blueIcon : code(position, announcements) === 'PNA026' ? greenIcon : greyIcon
+			});
 			markers[position.Train.AdvertisedTrainNumber] = marker;
-			marker.addTo(map).bindPopup(popupText(position));
+			marker.addTo(map).bindPopup(popupText(position, announcements));
 		});
 
 		if (data.ssePosition) {
@@ -53,7 +49,7 @@
 			const [lon, lat] = wgs84(position.Position.WGS84);
 			const marker = markers[position.Train.AdvertisedTrainNumber];
 			marker?.setLatLng([lat, lon]);
-			marker?.setPopupContent(popupText(position));
+			marker?.setPopupContent(popupText(position, announcements));
 		}
 	});
 
@@ -65,25 +61,6 @@
 
 		if (positionSource) positionSource.close();
 	});
-
-	function popupText(position) {
-		const announcement = announcements[position.Train.AdvertisedTrainNumber];
-		const product = announcement
-			? announcement.ProductInformation.map((p) => p.Description).join(' ') + ' '
-			: '';
-		const to = announcement
-			? '<br>mot ' + announcement.ToLocation.map((l) => l.LocationName).join()
-			: '';
-		const speed = position.Speed ? '<br>' + position.Speed + ' km/h' : '';
-		return product + position.Train.AdvertisedTrainNumber + to + speed;
-	}
-
-	function wgs84(s) {
-		return s
-			.match(/POINT \(([^ ]+) ([^ ]+)\)/)
-			.slice(1)
-			.map(Number);
-	}
 </script>
 
 <main>

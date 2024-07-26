@@ -20,8 +20,18 @@
 			popupAnchor: [0, -16]
 		};
 		const blueIcon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
+		const redIcon = L.icon({ ...iconSize, iconUrl: 'circle-red.svg' });
 		const greenIcon = L.icon({ ...iconSize, iconUrl: 'circle-green.svg' });
+		const cyanIcon = L.icon({ ...iconSize, iconUrl: 'circle-cyan.svg' });
 		const greyIcon = L.icon({ ...iconSize, iconUrl: 'circle-grey.svg' });
+
+		function icon(code) {
+			if (code === 'PNA014') return blueIcon;
+			if (code === 'PNA068') return redIcon;
+			if (code === 'PNA023' || code === 'PNA025' || code === 'PNA026') return greenIcon;
+			if (code.startsWith('PNA054')) return cyanIcon;
+			return greyIcon;
+		}
 
 		map = L.map(mapElement).setView([59.34389933923258, 17.053451499025947], 9);
 
@@ -30,7 +40,7 @@
 
 		data.positions.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon: code(position, announcements) === 'PNA014' ? blueIcon : code(position, announcements) === 'PNA026' ? greenIcon : greyIcon
+				icon: icon(code(position, announcements))
 			});
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));
@@ -46,9 +56,8 @@
 		}
 
 		function addPosition(position) {
-			const [lon, lat] = wgs84(position.Position.WGS84);
 			const marker = markers[position.Train.AdvertisedTrainNumber];
-			marker?.setLatLng([lat, lon]);
+			marker?.setLatLng(wgs84(position.Position.WGS84));
 			marker?.setPopupContent(popupText(position, announcements));
 		}
 	});

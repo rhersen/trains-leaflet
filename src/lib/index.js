@@ -10,7 +10,6 @@ function groupBy(array, callback) {
 	return acc;
 }
 
-
 export function groupAnnouncements(array) {
 	return Object.fromEntries(
 		Object.entries(groupBy(array, (a) => a.AdvertisedTrainIdent)).map(([train, [announcement]]) => [
@@ -33,10 +32,12 @@ export function popupText(position, announcements) {
 }
 
 export function wgs84(s) {
-	return s
+	const array = s
 		.match(/POINT \(([^ ]+) ([^ ]+)\)/)
 		.slice(1)
 		.map(Number);
+	array.reverse();
+	return array;
 }
 
 export function code(position, announcements) {

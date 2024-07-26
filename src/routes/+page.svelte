@@ -18,12 +18,13 @@
 	onMount(async () => {
 		const L = await import('leaflet');
 
-		const blueIcon = L.icon({
-			iconUrl: 'circle-blue.svg',
+		let iconSize = {
 			iconSize: [32, 32],
 			iconAnchor: [16, 16],
 			popupAnchor: [0, -16]
-		});
+		};
+		const blueIcon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
+		const greyIcon = L.icon({ ...iconSize, iconUrl: 'circle-grey.svg' });
 
 		map = L.map(mapElement).setView([59.34389933923258, 17.053451499025947], 9);
 
@@ -32,7 +33,9 @@
 
 		data.positions.forEach((position) => {
 			const [lon, lat] = wgs84(position.Position.WGS84);
-			const marker = L.marker([lat, lon], { icon: blueIcon });
+			const announcement = announcements[position.Train.AdvertisedTrainNumber];
+			const code = announcement ? announcement.ProductInformation.map((p) => p.Code).join(' ') : '';
+			const marker = L.marker([lat, lon], { icon: code === 'PNA014' ? blueIcon : greyIcon });
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position));
 		});

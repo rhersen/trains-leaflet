@@ -52,7 +52,7 @@ function positionQuery() {
     <QUERY objecttype='TrainPosition' namespace='järnväg.trafikinfo' sseurl='true' schemaversion='1.1'>
     <FILTER>
       <GT name='TimeStamp' value='${since}'/>
-      <WITHIN name="Position.SWEREF99TM" shape="box" value="553946 6493105, 679983 6659735"/>
+      <EQ name="Train.AdvertisedTrainNumber" value="8940"/>
     </FILTER>
     <INCLUDE>Bearing</INCLUDE>
     <INCLUDE>Position</INCLUDE>

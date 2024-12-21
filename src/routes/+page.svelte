@@ -23,17 +23,16 @@
 		const redIcon = L.icon({ ...iconSize, iconUrl: 'circle-red.svg' });
 		const greenIcon = L.icon({ ...iconSize, iconUrl: 'circle-green.svg' });
 		const cyanIcon = L.icon({ ...iconSize, iconUrl: 'circle-cyan.svg' });
-		const greyIcon = L.icon({ ...iconSize, iconUrl: 'circle-grey.svg' });
 
 		function icon(code) {
 			if (code === 'PNA014') return blueIcon;
 			if (code === 'PNA068') return redIcon;
 			if (code === 'PNA023' || code === 'PNA025' || code === 'PNA026') return greenIcon;
 			if (code.startsWith('PNA054')) return cyanIcon;
-			return greyIcon;
+			return blueIcon;
 		}
 
-		map = L.map(mapElement).setView([59.34389933923258, 17.053451499025947], 9);
+		map = L.map(mapElement).setView([59.34389933923258, 14], 7);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);

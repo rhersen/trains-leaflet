@@ -32,7 +32,7 @@
 			return blueIcon;
 		}
 
-		map = L.map(mapElement).setView([59.34389933923258, 14], 7);
+		map = L.map(mapElement).setView([59.2, 18], 10);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);

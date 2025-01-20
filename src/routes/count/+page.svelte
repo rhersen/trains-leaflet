@@ -19,18 +19,7 @@
 			iconAnchor: [16, 16],
 			popupAnchor: [0, -16]
 		};
-		const blueIcon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
-		const redIcon = L.icon({ ...iconSize, iconUrl: 'circle-red.svg' });
-		const greenIcon = L.icon({ ...iconSize, iconUrl: 'circle-green.svg' });
-		const cyanIcon = L.icon({ ...iconSize, iconUrl: 'circle-cyan.svg' });
-
-		function icon(code) {
-			if (code === 'PNA014') return blueIcon;
-			if (code === 'PNA068') return redIcon;
-			if (code === 'PNA023' || code === 'PNA025' || code === 'PNA026') return greenIcon;
-			if (code.startsWith('PNA054')) return cyanIcon;
-			return blueIcon;
-		}
+		const icon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
 
 		map = L.map(mapElement).setView([58, 15], 6);
 
@@ -39,9 +28,9 @@
 
 		data.positions.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon: icon(code(position, announcements))
+				icon
 			});
-			markers[position.Train.AdvertisedTrainNumber] = marker;
+			markers[position.Position.SWEREF99TM] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));
 		});
 
@@ -55,9 +44,20 @@
 		}
 
 		function addPosition(position) {
-			const marker = markers[position.Train.AdvertisedTrainNumber];
-			marker?.setLatLng(wgs84(position.Position.WGS84));
-			marker?.setPopupContent(popupText(position, announcements));
+			console.log(position.Position.SWEREF99TM);
+			const marker = markers[position.Position.SWEREF99TM];
+			if (marker) {
+				marker.setLatLng(wgs84(position.Position.WGS84));
+				marker.setPopupContent(
+					marker.getPopup().getContent() + ',' + popupText(position, announcements)
+				);
+			} else {
+				const marker = L.marker(wgs84(position.Position.WGS84), {
+					icon
+				});
+				markers[position.Position.SWEREF99TM] = marker;
+				marker.addTo(map).bindPopup(popupText(position, announcements));
+			}
 		}
 	});
 

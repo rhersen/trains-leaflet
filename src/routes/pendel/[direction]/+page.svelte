@@ -1,6 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { code, groupAnnouncements, popupText, wgs84 } from '$lib';
+	import { groupAnnouncements, popupText, wgs84 } from '$lib';
 	import { differenceInSeconds } from 'date-fns';
 
 	let mapElement;
@@ -37,7 +37,7 @@
 			return redIcon;
 		}
 
-		map = L.map(mapElement).setView([59, 18], 8);
+		map = L.map(mapElement).setView([59.33, 18.07], 11);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
@@ -70,6 +70,7 @@
 			const marker = markers[trainNumber];
 			marker?.setLatLng(wgs84(position.Position.WGS84));
 			marker?.setPopupContent(popupText(position, announcements));
+			marker?.setIcon(icon(trainNumber));
 
 			console.log(
 				trainNumber,

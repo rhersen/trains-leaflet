@@ -66,7 +66,7 @@ function announcementQuery(dir) {
 	return `
 <REQUEST>
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />
-    <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='false' schemaversion='1.6'>
+    <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='true' schemaversion='1.6'>
       <FILTER>
        	<LIKE name='AdvertisedTrainIdent' value='/^(?:2[2-9][0-9][${dir}]|12[89][0-9][${dir}]|52[2-7][0-9][${dir}])$/' />
         <GT name='TimeAtLocationWithSeconds' value='${since}' />

@@ -20,21 +20,35 @@
 			iconAnchor: [16, 16],
 			popupAnchor: [0, -16]
 		};
-		const blueIcon = L.icon({ ...iconSize, iconUrl: '/circle-blue.svg' });
-		const redIcon = L.icon({ ...iconSize, iconUrl: '/circle-red.svg' });
-		const greenIcon = L.icon({ ...iconSize, iconUrl: '/circle-green.svg' });
-		const cyanIcon = L.icon({ ...iconSize, iconUrl: '/circle-cyan.svg' });
+
+		function createCircleIcon(hue) {
+			const black = `<circle cx="32" cy="32" r="25" fill="none" stroke="black" stroke-width="12" />`;
+			const circle = `<circle cx="32" cy="32" r="25" fill="none" stroke="hsl(${hue} 100% 50%" stroke-width="8" />`;
+			const b = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${black}${circle}</svg>`;
+			return L.icon({
+				...iconSize,
+				iconUrl: `data:image/svg+xml;base64,${btoa(b)}`
+			});
+		}
+
+		const delay0 = createCircleIcon(120);
+		const delay1 = createCircleIcon(75);
+		const delay3 = createCircleIcon(60);
+		const delay5 = createCircleIcon(33);
+		const delay10 = createCircleIcon(25);
+		const delay15 = createCircleIcon(0);
 
 		function icon(trainNumber) {
 			const d = differenceInSeconds(
 				announcements[trainNumber]?.TimeAtLocationWithSeconds,
 				announcements[trainNumber]?.AdvertisedTimeAtLocation
 			);
-			console.log(trainNumber, d);
-			if (d < 100) return greenIcon;
-			if (d < 200) return blueIcon;
-			if (d < 400) return cyanIcon;
-			return redIcon;
+			if (d < 120) return delay0;
+			if (d < 180) return delay1;
+			if (d < 300) return delay3;
+			if (d < 600) return delay5;
+			if (d < 900) return delay10;
+			return delay15;
 		}
 
 		map = L.map(mapElement).setView([59.33, 18.07], 11);

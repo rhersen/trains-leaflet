@@ -33,7 +33,7 @@
 
 		function createSquareIcon(hue) {
 			const black = `<polygon points="32,8 56,32 32,56 8,32" fill="none" stroke="black" stroke-width="12" />`;
-			const diamond = `<polygon points="32,8 56,32 32,56 8,32" fill="none" stroke="hsl(${hue} 100% 50%)" stroke-width="8" />`;
+			const diamond = `<polygon points="32,8 56,32 32,56 8,32" fill="none" stroke="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" stroke-width="8" />`;
 			const b = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${black}${diamond}</svg>`;
 			return L.icon({
 				...iconSize,
@@ -48,6 +48,7 @@
 		const circle10 = createCircleIcon(25);
 		const circle15 = createCircleIcon(0);
 
+		const squareNaN = createSquareIcon(-1);
 		const square0 = createSquareIcon(120);
 		const square1 = createSquareIcon(75);
 		const square3 = createSquareIcon(60);
@@ -61,6 +62,7 @@
 				announcements[trainNumber]?.AdvertisedTimeAtLocation
 			);
 			const atStation = announcements[trainNumber]?.ActivityType === 'Ankomst';
+			if (isNaN(d)) return squareNaN;
 			if (d < 120) return atStation ? square0 : circle0;
 			if (d < 180) return atStation ? square1 : circle1;
 			if (d < 300) return atStation ? square3 : circle3;

@@ -21,54 +21,31 @@
 			popupAnchor: [0, -16]
 		};
 
-		function createCircleIcon(hue) {
-			const black = `<circle cx="32" cy="32" r="25" fill="none" stroke="black" stroke-width="12" />`;
-			const circle = `<circle cx="32" cy="32" r="25" fill="none" stroke="hsl(${hue} 100% 50%" stroke-width="8" />`;
-			const b = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${black}${circle}</svg>`;
-			return L.icon({
-				...iconSize,
-				iconUrl: `data:image/svg+xml;base64,${btoa(b)}`
-			});
-		}
-
-		function createSquareIcon(hue) {
-			const black = `<polygon points="32,8 56,32 32,56 8,32" fill="none" stroke="black" stroke-width="12" />`;
-			const diamond = `<polygon points="32,8 56,32 32,56 8,32" fill="none" stroke="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" stroke-width="8" />`;
-			const b = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${black}${diamond}</svg>`;
-			return L.icon({
-				...iconSize,
-				iconUrl: `data:image/svg+xml;base64,${btoa(b)}`
-			});
-		}
-
-		const circle0 = createCircleIcon(120);
-		const circle1 = createCircleIcon(75);
-		const circle3 = createCircleIcon(60);
-		const circle5 = createCircleIcon(33);
-		const circle10 = createCircleIcon(25);
-		const circle15 = createCircleIcon(0);
-
-		const squareNaN = createSquareIcon(-1);
-		const square0 = createSquareIcon(120);
-		const square1 = createSquareIcon(75);
-		const square3 = createSquareIcon(60);
-		const square5 = createSquareIcon(33);
-		const square10 = createSquareIcon(25);
-		const square15 = createSquareIcon(0);
-
-		function icon(trainNumber) {
+		function icon(position) {
 			const d = differenceInSeconds(
-				announcements[trainNumber]?.TimeAtLocationWithSeconds,
-				announcements[trainNumber]?.AdvertisedTimeAtLocation
+				announcements[position.Train.AdvertisedTrainNumber]?.TimeAtLocationWithSeconds,
+				announcements[position.Train.AdvertisedTrainNumber]?.AdvertisedTimeAtLocation
 			);
-			const atStation = announcements[trainNumber]?.ActivityType === 'Ankomst';
-			if (isNaN(d)) return squareNaN;
-			if (d < 120) return atStation ? square0 : circle0;
-			if (d < 180) return atStation ? square1 : circle1;
-			if (d < 300) return atStation ? square3 : circle3;
-			if (d < 600) return atStation ? square5 : circle5;
-			if (d < 900) return atStation ? square10 : circle10;
-			return atStation ? square15 : circle15;
+
+			let hue;
+			if (isNaN(d)) hue = -1;
+			else if (d < 120) hue = 120;
+			else if (d < 180) hue = 75;
+			else if (d < 300) hue = 60;
+			else if (d < 600) hue = 33;
+			else if (d < 900) hue = 25;
+			else hue = 0;
+
+			const bearing = position.Bearing;
+
+			const black = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="black" stroke-width="10" />`;
+			const diamond = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" stroke-width="6" />`;
+			const g = `<g transform="translate(32,32) rotate(${bearing},0,0)">${black}${diamond}</g>`;
+			const svg = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+			return L.icon({
+				...iconSize,
+				iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`
+			});
 		}
 
 		map = L.map(mapElement).setView([59.33, 18.07], 11);
@@ -78,7 +55,7 @@
 
 		data.positions.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon: icon(position.Train.AdvertisedTrainNumber)
+				icon: icon(position)
 			});
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));
@@ -101,8 +78,6 @@
 				result.TrainAnnouncement.forEach((a) => {
 					const trainNumber = a.AdvertisedTrainIdent;
 					announcements[trainNumber] = a;
-					const marker = markers[trainNumber];
-					marker?.setIcon(icon(trainNumber));
 				});
 			};
 		}
@@ -112,7 +87,7 @@
 			const marker = markers[trainNumber];
 			marker?.setLatLng(wgs84(position.Position.WGS84));
 			marker?.setPopupContent(popupText(position, announcements));
-			marker?.setIcon(icon(trainNumber));
+			marker?.setIcon(icon(position));
 		}
 	});
 

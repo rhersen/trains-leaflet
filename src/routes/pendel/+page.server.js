@@ -50,7 +50,7 @@ function positionQuery(dir) {
     <QUERY objecttype='TrainPosition' namespace='järnväg.trafikinfo' sseurl='true' schemaversion='1.1'>
     <FILTER>
       <GT name='TimeStamp' value='${since}'/>
-     	<LIKE name='Train.AdvertisedTrainNumber' value='/^(2255|2757|959|143)$/' />
+     	<LIKE name='Train.AdvertisedTrainNumber' value='/^(?:2[2-9][0-9][0-9]|12[89][0-9][0-9]|52[2-7][0-9][${dir}])$/' />
     </FILTER>
     <INCLUDE>Bearing</INCLUDE>
     <INCLUDE>Position</INCLUDE>
@@ -68,7 +68,7 @@ function announcementQuery(dir) {
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />
     <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='true' schemaversion='1.6'>
       <FILTER>
-       	<LIKE name='AdvertisedTrainIdent' value='/^(2255|2757|959|143)$/' />
+       	<LIKE name='AdvertisedTrainIdent' value='/^(?:2[2-9][0-9][0-9]|12[89][0-9][0-9]|52[2-7][0-9][${dir}])$/' />
         <GT name='TimeAtLocationWithSeconds' value='${since}' />
         <EXISTS name='ToLocation' value='true' />
       </FILTER>

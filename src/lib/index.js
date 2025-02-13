@@ -26,8 +26,7 @@ export function popupText(position, announcements) {
 		: '';
 	const to = announcement ? '–' + announcement.ToLocation.map((l) => l.LocationName).join() : '';
 	const speed = position.Speed ? '<br>' + position.Speed + ' km/h' : '';
-	const bearing = position.Bearing ? ' ' + position.Bearing + '°' : '';
-	return position.Train.AdvertisedTrainNumber + from + to + speed + bearing;
+	return position.Train.AdvertisedTrainNumber + from + to + speed;
 }
 
 export function wgs84(s) {

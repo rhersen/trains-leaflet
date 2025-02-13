@@ -10,7 +10,7 @@
 
 	export let data;
 
-	let announcements = groupAnnouncements(data.announcements);
+	let announcements = groupAnnouncements(data.announcements?.TrainAnnouncement ?? []);
 
 	onMount(async () => {
 		const L = await import('leaflet');
@@ -53,7 +53,7 @@
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
-		data.positions.forEach((position) => {
+		data.positions.TrainPosition.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
 				icon: icon(position)
 			});
@@ -61,8 +61,8 @@
 			marker.addTo(map).bindPopup(popupText(position, announcements));
 		});
 
-		if (data.ssePosition) {
-			positionSource = new EventSource(data.ssePosition);
+		if (data.positions.INFO?.SSEURL) {
+			positionSource = new EventSource(data.positions.INFO.SSEURL);
 			positionSource.onmessage = ({ data: s }) => {
 				const json = JSON.parse(s);
 				const [result] = json.RESPONSE.RESULT;
@@ -70,8 +70,8 @@
 			};
 		}
 
-		if (data.sseAnnouncement) {
-			announcementSource = new EventSource(data.sseAnnouncement);
+		if (data.announcements.INFO?.SSEURL) {
+			announcementSource = new EventSource(data.announcements.INFO.SSEURL);
 			announcementSource.onmessage = ({ data: s }) => {
 				const json = JSON.parse(s);
 				const [result] = json.RESPONSE.RESULT;

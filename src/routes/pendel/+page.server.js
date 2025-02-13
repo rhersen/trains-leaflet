@@ -14,7 +14,7 @@ async function positionResult() {
 
 	const { RESPONSE } = await response.json();
 	const [result] = RESPONSE.RESULT;
-	return { positions: result.TrainPosition, ssePosition: result.INFO?.SSEURL };
+	return result;
 }
 
 async function announcementResult() {
@@ -31,13 +31,14 @@ async function announcementResult() {
 
 	const { RESPONSE } = await response.json();
 	const [result] = RESPONSE.RESULT;
-	return { announcements: result.TrainAnnouncement, sseAnnouncement: result.INFO?.SSEURL };
+	return result;
 }
 
 export const load = async () => {
-	const { positions, ssePosition } = await positionResult();
-	const { announcements, sseAnnouncement } = await announcementResult();
-	return { positions, announcements, ssePosition, sseAnnouncement };
+	return {
+		positions: await positionResult(),
+		announcements: await announcementResult()
+	};
 };
 
 const minutes = 6e4;

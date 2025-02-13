@@ -42,7 +42,7 @@ export const load = async () => {
 
 const minutes = 6e4;
 
-function positionQuery(dir) {
+function positionQuery() {
 	const since = new Date(Date.now() - 8 * minutes).toISOString();
 	return `
 <REQUEST>
@@ -50,7 +50,7 @@ function positionQuery(dir) {
     <QUERY objecttype='TrainPosition' namespace='järnväg.trafikinfo' sseurl='true' schemaversion='1.1'>
     <FILTER>
       <GT name='TimeStamp' value='${since}'/>
-     	<LIKE name='Train.AdvertisedTrainNumber' value='/^(?:2[2-9][0-9][0-9]|12[89][0-9][0-9]|52[2-7][0-9][${dir}])$/' />
+     	<LIKE name='Train.AdvertisedTrainNumber' value='/^(?:2[2-9]\\d\\d|12[89]\\d\\d|52[2-7]\\d\\d)$/' />
     </FILTER>
     <INCLUDE>Bearing</INCLUDE>
     <INCLUDE>Position</INCLUDE>
@@ -61,14 +61,14 @@ function positionQuery(dir) {
 </REQUEST>`;
 }
 
-function announcementQuery(dir) {
+function announcementQuery() {
 	const since = new Date(Date.now() - 4 * minutes).toISOString();
 	return `
 <REQUEST>
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />
     <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='true' schemaversion='1.6'>
       <FILTER>
-       	<LIKE name='AdvertisedTrainIdent' value='/^(?:2[2-9][0-9][0-9]|12[89][0-9][0-9]|52[2-7][0-9][${dir}])$/' />
+       	<LIKE name='AdvertisedTrainIdent' value='/^(?:2[2-9]\\d\\d|12[89]\\d\\d|52[2-7]\\d\\d)$/' />
         <GT name='TimeAtLocationWithSeconds' value='${since}' />
         <EXISTS name='ToLocation' value='true' />
       </FILTER>

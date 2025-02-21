@@ -1,12 +1,13 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { groupAnnouncements, popupText, wgs84 } from '$lib';
+	import { groupAnnouncements, interpolate, popupText, wgs84 } from '$lib';
 	import { differenceInSeconds } from 'date-fns';
 
 	let mapElement;
 	let map;
 	let positionSource, announcementSource;
-	let markers = {};
+	let trains = {};
+	let currentTime = new Date();
 
 	export let data;
 
@@ -57,7 +58,7 @@
 			const marker = L.marker(wgs84(position.Position.WGS84), {
 				icon: icon(position)
 			});
-			markers[position.Train.AdvertisedTrainNumber] = marker;
+			trains[position.Train.AdvertisedTrainNumber] = { marker, positions: [position] };
 			marker.addTo(map).bindPopup(popupText(position, announcements));
 		});
 
@@ -84,12 +85,25 @@
 
 		function addPosition(position) {
 			const trainNumber = position.Train.AdvertisedTrainNumber;
-			const marker = markers[trainNumber];
-			marker?.setLatLng(wgs84(position.Position.WGS84));
-			marker?.setPopupContent(popupText(position, announcements));
-			marker?.setIcon(icon(position));
+			const train = trains[trainNumber];
+			train?.positions.unshift(position);
+			train?.marker.setPopupContent(popupText(position, announcements));
+			train?.marker.setIcon(icon(position));
 		}
+
+		const timer = setInterval(() => {
+			currentTime = new Date();
+		}, 2000);
+
+		return () => clearInterval(timer);
 	});
+
+	$: {
+		for (const trainNumber in trains) {
+			const train = trains[trainNumber];
+			train.marker.setLatLng(interpolate(train.positions, currentTime));
+		}
+	}
 
 	onDestroy(async () => {
 		if (map) {

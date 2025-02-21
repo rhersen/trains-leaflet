@@ -1,11 +1,12 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { code, groupAnnouncements, popupText, wgs84 } from '$lib';
+	import { code, groupAnnouncements, interpolate, popupText, wgs84 } from '$lib';
 
 	let mapElement;
 	let map;
 	let positionSource;
-	let markers = {};
+	let marker;
+	let currentTime = new Date();
 
 	export let data;
 
@@ -38,10 +39,9 @@
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
 		data.positions.forEach((position) => {
-			const marker = L.marker(wgs84(position.Position.WGS84), {
+			marker = L.marker(wgs84(position.Position.WGS84), {
 				icon: icon(code(position, announcements))
 			});
-			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));
 		});
 
@@ -49,17 +49,20 @@
 			positionSource = new EventSource(data.ssePosition);
 			positionSource.onmessage = ({ data: s }) => {
 				const json = JSON.parse(s);
-				const [result] = json.RESPONSE.RESULT;
-				result.TrainPosition.forEach(addPosition);
+				const a = [...json.RESPONSE.RESULT[0].TrainPosition, ...data.positions];
+				data.positions = a.slice(0, 8);
+				marker?.setLatLng(interpolate(data.positions, currentTime));
 			};
 		}
 
-		function addPosition(position) {
-			const marker = markers[position.Train.AdvertisedTrainNumber];
-			marker?.setLatLng(wgs84(position.Position.WGS84));
-			marker?.setPopupContent(popupText(position, announcements));
-		}
+		const timer = setInterval(() => {
+			currentTime = new Date();
+		}, 200);
+
+		return () => clearInterval(timer);
 	});
+
+	$: marker?.setLatLng(interpolate(data.positions, currentTime));
 
 	onDestroy(async () => {
 		if (map) {

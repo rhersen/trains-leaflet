@@ -1,4 +1,4 @@
-import { parseISO } from 'date-fns';
+// place files you want to import through the `$lib` alias in this folder.
 
 function groupBy(array, callback) {
 	const acc = {};
@@ -36,26 +36,6 @@ export function wgs84(s) {
 		.map(Number);
 	array.reverse();
 	return array;
-}
-
-export function interpolate(positions, now) {
-	const t = now - 30000;
-	if (!positions.length) return [];
-	if (positions.length === 1) return wgs84(positions[0].Position.WGS84);
-	let i = positions.findIndex((p) => parseISO(p.TimeStamp).getTime() < t);
-	if (i === 0) return wgs84(positions[0].Position.WGS84);
-	if (i === -1) i = positions.length - 1;
-	let j = i - 1;
-	if (positions[i].Position.WGS84 === positions[j].Position.WGS84 && i < positions.length - 1) ++i;
-	const t0 = parseISO(positions[j].TimeStamp).getTime();
-	const t1 = parseISO(positions[i].TimeStamp).getTime();
-	const p0 = wgs84(positions[j].Position.WGS84);
-	const p1 = wgs84(positions[i].Position.WGS84);
-
-	return [
-		p0[0] + ((p1[0] - p0[0]) * (t - t0)) / (t1 - t0),
-		p0[1] + ((p1[1] - p0[1]) * (t - t0)) / (t1 - t0)
-	];
 }
 
 export function code(position, announcements) {

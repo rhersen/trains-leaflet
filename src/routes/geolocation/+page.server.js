@@ -36,7 +36,7 @@ function positionQuery(longitude, latitude) {
     <QUERY objecttype='TrainPosition' namespace='järnväg.trafikinfo' sseurl='true' schemaversion='1.1'>
     <FILTER>
       <GT name='TimeStamp' value='${since}'/>
-      <WITHIN name="Position.WGS84" shape="center" value="${longitude} ${latitude}" radius="30000m" />
+      <WITHIN name="Position.WGS84" shape="center" value="${longitude} ${latitude}" radius="16000m" />
     </FILTER>
     <INCLUDE>Bearing</INCLUDE>
     <INCLUDE>Position</INCLUDE>

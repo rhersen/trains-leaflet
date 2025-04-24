@@ -1,6 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { code, groupAnnouncements, popupText, wgs84 } from '$lib';
+	import { code, groupAnnouncements, popupText, wgs84 } from '$lib/utils';
 
 	let mapElement;
 	let map;

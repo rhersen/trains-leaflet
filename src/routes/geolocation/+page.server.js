@@ -18,11 +18,12 @@ async function positionResult(longitude, latitude) {
 }
 
 export const load = async ({ url }) => {
-	const { positions, ssePosition } = await positionResult(
-		url.searchParams.get('longitude'),
-		url.searchParams.get('latitude')
-	);
-	return { positions, announcements: [], ssePosition };
+	const longitude = url.searchParams.get('longitude');
+	const latitude = url.searchParams.get('latitude');
+	if (longitude && latitude) {
+		const { positions, ssePosition } = await positionResult(longitude, latitude);
+		return { positions, announcements: [], ssePosition };
+	} else return { positions: [], announcements: [] };
 };
 
 const minutes = 6e4;

@@ -25,7 +25,7 @@ export const load = async ({ url }) => {
 		const announcements = await announcementResult(
 			positions.map(({ Train }) => Train.AdvertisedTrainNumber)
 		);
-		return { positions, announcements, ssePosition };
+		return { positions, announcements, ssePosition, longitude, latitude };
 	} else return { positions: [], announcements: [] };
 };
 

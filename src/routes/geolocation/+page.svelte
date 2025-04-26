@@ -1,8 +1,5 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { get } from 'svelte/store';
 	import { groupAnnouncements, popupText, wgs84 } from '$lib/utils';
 
 	let mapElement;
@@ -24,7 +21,7 @@
 		};
 		const icon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
 
-		map = L.map(mapElement).setView([58, 15], 6);
+		map = L.map(mapElement).setView([data.latitude ?? 58, data.longitude ?? 15], 11);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
@@ -45,21 +42,6 @@
 				result.TrainPosition.forEach(addPosition);
 			};
 		}
-
-		navigator.geolocation.getCurrentPosition(
-			({ coords }) => {
-				console.log(coords);
-				const query = new URLSearchParams(get(page).url.search);
-				query.set('latitude', coords.latitude);
-				query.set('longitude', coords.longitude);
-				map.setView([coords.latitude, coords.longitude], 10);
-				const url = `${get(page).url.pathname}?${query.toString()}`;
-				goto(url, { replaceState: false, keepfocus: true, noscroll: true });
-			},
-			(error) => {
-				console.err(error);
-			}
-		);
 
 		function addPosition(position) {
 			const trainNumber = position.Train.AdvertisedTrainNumber;

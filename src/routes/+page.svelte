@@ -1,7 +1,28 @@
+<script>
+	import { onMount } from 'svelte';
+
+	let queryString = '';
+
+	onMount(() => {
+		navigator.geolocation.getCurrentPosition(
+			({ coords }) => {
+				console.log(coords);
+				const query = new URLSearchParams();
+				query.set('latitude', coords.latitude);
+				query.set('longitude', coords.longitude);
+				queryString = query.toString();
+			},
+			(error) => {
+				console.error(error);
+			}
+		);
+	});
+</script>
+
 <ul>
 	<li><a href="pendel">pendel</a></li>
 	<li><a href="recent">senaste</a></li>
-	<li><a href="geolocation">geolocation</a></li>
+	<li><a href="geolocation?{queryString}">geolocation</a></li>
 	<li><a href="pendel/n">norrgående</a></li>
 	<li><a href="pendel/s">södergående</a></li>
 </ul>

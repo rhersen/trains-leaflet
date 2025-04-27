@@ -1,6 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { groupAnnouncements, popupText, wgs84 } from '$lib/utils';
+	import { code, groupAnnouncements, popupText, wgs84 } from '$lib/utils';
 
 	let mapElement;
 	let map;
@@ -19,7 +19,20 @@
 			iconAnchor: [16, 16],
 			popupAnchor: [0, -16]
 		};
-		const icon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
+
+		const blueIcon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
+		const redIcon = L.icon({ ...iconSize, iconUrl: 'circle-red.svg' });
+		const greenIcon = L.icon({ ...iconSize, iconUrl: 'circle-green.svg' });
+		const cyanIcon = L.icon({ ...iconSize, iconUrl: 'circle-cyan.svg' });
+		const greyIcon = L.icon({ ...iconSize, iconUrl: 'circle-grey.svg' });
+
+		function icon(code) {
+			if (code === 'PNA014') return blueIcon;
+			if (code === 'PNA068') return redIcon;
+			if (code === 'PNA023' || code === 'PNA025' || code === 'PNA026') return greenIcon;
+			if (code.startsWith('PNA054')) return cyanIcon;
+			return greyIcon;
+		}
 
 		map = L.map(mapElement).setView([data.latitude ?? 58, data.longitude ?? 15], 11);
 
@@ -28,7 +41,7 @@
 
 		data.positions.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon
+				icon: icon(code(position, announcements))
 			});
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));

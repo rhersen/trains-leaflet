@@ -22,11 +22,12 @@ export function groupAnnouncements(array) {
 export function popupText(position, announcements) {
 	const announcement = announcements[position.Train.AdvertisedTrainNumber];
 	const from = announcement
-		? ' ' + announcement.FromLocation.map((l) => l.LocationName).join()
+		? '<br>' + announcement.FromLocation.map((l) => l.LocationName).join()
 		: '';
 	const to = announcement ? '–' + announcement.ToLocation.map((l) => l.LocationName).join() : '';
 	const speed = position.Speed ? '<br>' + position.Speed + ' km/h' : '';
-	return position.Train.AdvertisedTrainNumber + from + to + speed;
+	const prod = announcement ? announcement?.ProductInformation[0].Description + ' ' : '';
+	return prod + position.Train.AdvertisedTrainNumber + from + to + speed;
 }
 
 export function wgs84(s) {

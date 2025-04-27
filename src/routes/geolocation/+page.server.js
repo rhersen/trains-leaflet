@@ -53,10 +53,10 @@ function positionQuery(longitude, latitude) {
 	return `
 <REQUEST>
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />
-    <QUERY objecttype='TrainPosition' namespace='järnväg.trafikinfo' sseurl='false' schemaversion='1.1'>
+    <QUERY objecttype='TrainPosition' namespace='järnväg.trafikinfo' sseurl='true' schemaversion='1.1'>
     <FILTER>
       <GT name='TimeStamp' value='${since}'/>
-      <WITHIN name="Position.WGS84" shape="center" value="${longitude} ${latitude}" radius="16000m" />
+      <WITHIN name="Position.WGS84" shape="center" value="${longitude} ${latitude}" radius="10000m" />
     </FILTER>
     <INCLUDE>Bearing</INCLUDE>
     <INCLUDE>Position</INCLUDE>
@@ -68,11 +68,11 @@ function positionQuery(longitude, latitude) {
 }
 
 function announcementQuery(trains) {
-	const since = new Date(Date.now() - 4 * minutes).toISOString();
+	const since = new Date(Date.now() - 99 * minutes).toISOString();
 	return `
 <REQUEST>
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />
-    <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='true' schemaversion='1.6'>
+    <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='false' schemaversion='1.6'>
       <FILTER>
         <IN name='AdvertisedTrainIdent' value='${trains.join()}' />
         <GT name='TimeAtLocationWithSeconds' value='${since}' />

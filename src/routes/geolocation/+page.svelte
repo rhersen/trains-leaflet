@@ -20,16 +20,11 @@
 			popupAnchor: [0, -16]
 		};
 
-		const blueIcon = L.icon({ ...iconSize, iconUrl: 'circle-blue.svg' });
-		const redIcon = L.icon({ ...iconSize, iconUrl: 'circle-red.svg' });
-		const greenIcon = L.icon({ ...iconSize, iconUrl: 'circle-green.svg' });
-		const cyanIcon = L.icon({ ...iconSize, iconUrl: 'circle-cyan.svg' });
-		const greyIcon = L.icon({ ...iconSize, iconUrl: 'circle-grey.svg' });
-
 		function icon(code) {
 			let color = 'grey';
 			if (code === 'PNA014') color = 'blue';
-			if (code === 'PNA068') color = 'red';
+			if (code === 'PNA065') color = 'red';
+			if (code === 'PNA038' || code === 'PNA098') color = 'yellow';
 			if (code === 'PNA023' || code === 'PNA025' || code === 'PNA026') color = 'green';
 			if (code.startsWith('PNA054')) color = 'cyan';
 			const circle = `<circle cx="32" cy="32" r="25" fill="none" stroke="${color}" stroke-width="12" />`;

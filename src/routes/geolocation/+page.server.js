@@ -22,9 +22,8 @@ export const load = async ({ url }) => {
 	const latitude = url.searchParams.get('latitude');
 	if (longitude && latitude) {
 		const { positions, ssePosition } = await positionResult(longitude, latitude);
-		const announcements = await announcementResult(
-			positions.map(({ Train }) => Train.AdvertisedTrainNumber)
-		);
+		const trainNumbers = positions.map(({ Train }) => Train.AdvertisedTrainNumber);
+		const announcements = trainNumbers.length ? await announcementResult(trainNumbers) : [];
 		return { positions, announcements, ssePosition, longitude, latitude };
 	} else return { positions: [], announcements: [] };
 };

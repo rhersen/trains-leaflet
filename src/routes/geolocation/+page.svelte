@@ -22,11 +22,12 @@
 
 		function icon(code) {
 			let color = 'grey';
-			if (code === 'PNA014') color = 'blue';
+			if (code === 'PNA014' || code === 'PNA040' || code === 'PNA041') color = 'blue';
 			if (code === 'PNA065') color = 'red';
 			if (code === 'PNA038' || code === 'PNA098') color = 'yellow';
+			if (code === 'PNA021') color = 'brown';
 			if (code === 'PNA023' || code === 'PNA025' || code === 'PNA026') color = 'green';
-			if (code.startsWith('PNA054')) color = 'cyan';
+			if (code.startsWith('PNA054') || code === 'PNA010' || code === 'PNA043') color = 'cyan';
 			const circle = `<circle cx="32" cy="32" r="25" fill="none" stroke="${color}" stroke-width="12" />`;
 			const svg = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${circle}</svg>`;
 			return L.icon({

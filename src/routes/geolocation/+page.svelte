@@ -44,7 +44,7 @@
 				marker?.setPopupContent(popupText(position, announcements));
 			} else {
 				const marker = L.marker(wgs84(position.Position.WGS84), {
-					icon: icon(code(position, announcements))
+					icon: createLeafletIcon(code(position, announcements), L)
 				});
 				markers[position.Train.AdvertisedTrainNumber] = marker;
 				marker.addTo(map).bindPopup(popupText(position, announcements));

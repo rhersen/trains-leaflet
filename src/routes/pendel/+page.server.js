@@ -1,9 +1,16 @@
 import { error } from '@sveltejs/kit';
 
-async function positionResult() {
-	const response = await fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
+const API_URL = 'https://api.trafikinfo.trafikverket.se/v2/data.json';
+
+export const load = async () => ({
+	positions: await fetchTrafikverket(positionQuery()),
+	announcements: await fetchTrafikverket(announcementQuery())
+});
+
+async function fetchTrafikverket(body) {
+	const response = await fetch(API_URL, {
 		method: 'POST',
-		body: positionQuery(),
+		body,
 		headers: {
 			'Content-Type': 'application/xml',
 			Accept: 'application/json'
@@ -16,30 +23,6 @@ async function positionResult() {
 	const [result] = RESPONSE.RESULT;
 	return result;
 }
-
-async function announcementResult() {
-	const response = await fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
-		method: 'POST',
-		body: announcementQuery(),
-		headers: {
-			'Content-Type': 'application/xml',
-			Accept: 'application/json'
-		}
-	});
-
-	if (!response.ok) throw error(response.status, response.statusText);
-
-	const { RESPONSE } = await response.json();
-	const [result] = RESPONSE.RESULT;
-	return result;
-}
-
-export const load = async () => {
-	return {
-		positions: await positionResult(),
-		announcements: await announcementResult()
-	};
-};
 
 const minutes = 6e4;
 

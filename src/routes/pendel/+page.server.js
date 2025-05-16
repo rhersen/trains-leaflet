@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 
-const API_URL = 'https://api.trafikinfo.trafikverket.se/v2/data.json';
+const apiUrl = 'https://api.trafikinfo.trafikverket.se/v2/data.json';
+const headers = { 'Content-Type': 'application/xml', Accept: 'application/jsn' };
 
 export const load = async () => ({
 	positions: await fetchTrafikverket(positionQuery()),
@@ -8,14 +9,7 @@ export const load = async () => ({
 });
 
 async function fetchTrafikverket(body) {
-	const response = await fetch(API_URL, {
-		method: 'POST',
-		body,
-		headers: {
-			'Content-Type': 'application/xml',
-			Accept: 'application/json'
-		}
-	});
+	const response = await fetch(apiUrl, { method: 'POST', body, headers });
 
 	if (!response.ok) throw error(response.status, response.statusText);
 

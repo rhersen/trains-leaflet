@@ -48,7 +48,7 @@
 			});
 		}
 
-		map = L.map(mapElement).setView([58, 16], 7);
+		map = L.map(mapElement).setView([58, 16], 6);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);

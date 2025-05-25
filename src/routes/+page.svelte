@@ -21,6 +21,7 @@
 
 <ul>
 	<li><a href="pendel">pendel</a></li>
+	<li><a href="race">race</a></li>
 	<li><a href="recent">senaste</a></li>
 	<li><a href="geolocation?{queryString}">geolocation</a></li>
 	<li><a href="animering">animering</a></li>

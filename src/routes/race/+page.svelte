@@ -5,12 +5,12 @@
 
 	let mapElement;
 	let map;
-	let positionSource;
+	let positionSource, announcementSource;
 	let markers = {};
 
 	export let data;
 
-	let announcements = groupAnnouncements(data.announcements);
+	let announcements = groupAnnouncements(data.announcements?.TrainAnnouncement ?? []);
 
 	onMount(async () => {
 		const L = await import('leaflet');
@@ -28,7 +28,7 @@
 			);
 
 			let hue;
-			if (isNaN(d)) hue = 120;
+			if (isNaN(d)) hue = -1;
 			else if (d < 120) hue = 120;
 			else if (d < 180) hue = 75;
 			else if (d < 300) hue = 60;
@@ -48,12 +48,12 @@
 			});
 		}
 
-		map = L.map(mapElement).setView([58, 15], 6);
+		map = L.map(mapElement).setView([58, 16], 7);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
-		data.positions.forEach((position) => {
+		data.positions.TrainPosition.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
 				icon: icon(position)
 			});
@@ -61,8 +61,8 @@
 			marker.addTo(map).bindPopup(popupText(position, announcements));
 		});
 
-		if (data.ssePosition) {
-			positionSource = new EventSource(data.ssePosition);
+		if (data.positions.INFO?.SSEURL) {
+			positionSource = new EventSource(data.positions.INFO.SSEURL);
 			positionSource.onmessage = ({ data: s }) => {
 				const json = JSON.parse(s);
 				const [result] = json.RESPONSE.RESULT;
@@ -70,9 +70,21 @@
 			};
 		}
 
+		if (data.announcements.INFO?.SSEURL) {
+			announcementSource = new EventSource(data.announcements.INFO.SSEURL);
+			announcementSource.onmessage = ({ data: s }) => {
+				const json = JSON.parse(s);
+				const [result] = json.RESPONSE.RESULT;
+				result.TrainAnnouncement.forEach((a) => {
+					const trainNumber = a.AdvertisedTrainIdent;
+					announcements[trainNumber] = a;
+				});
+			};
+		}
+
 		function addPosition(position) {
-			console.log(position);
-			const marker = markers[position.Train.AdvertisedTrainNumber];
+			const trainNumber = position.Train.AdvertisedTrainNumber;
+			const marker = markers[trainNumber];
 			marker?.setLatLng(wgs84(position.Position.WGS84));
 			marker?.setPopupContent(popupText(position, announcements));
 			marker?.setIcon(icon(position));
@@ -86,6 +98,7 @@
 		}
 
 		if (positionSource) positionSource.close();
+		if (announcementSource) announcementSource.close();
 	});
 </script>
 

@@ -66,10 +66,18 @@
 
 		function addPosition(position) {
 			const trainNumber = position.Train.AdvertisedTrainNumber;
-			const marker = markers[trainNumber];
-			marker?.setLatLng(wgs84(position.Position.WGS84));
-			marker?.setPopupContent(popupText(position, announcements));
-			marker?.setIcon(L.icon(icon(position.Bearing, getHue(position))));
+			if (!markers[trainNumber]) {
+				console.log('creating marker for', trainNumber);
+				markers[trainNumber] = L.marker(wgs84(position.Position.WGS84), {
+					icon: L.icon(icon(position.Bearing, getHue(position)))
+				});
+				markers[trainNumber].addTo(map).bindPopup(popupText(position, announcements));
+			} else {
+				const marker = markers[trainNumber];
+				marker?.setLatLng(wgs84(position.Position.WGS84));
+				marker?.setPopupContent(popupText(position, announcements));
+				marker?.setIcon(L.icon(icon(position.Bearing, getHue(position))));
+			}
 		}
 	});
 

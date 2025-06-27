@@ -3,10 +3,15 @@ import { error } from '@sveltejs/kit';
 const apiUrl = 'https://api.trafikinfo.trafikverket.se/v2/data.json';
 const headers = { 'Content-Type': 'application/xml', Accept: 'application/jsn' };
 
-export const load = async () => ({
-	positions: await fetchTrafikverket(positionQuery()),
-	announcements: await fetchTrafikverket(announcementQuery())
-});
+export const load = async () => {
+	const positions = await fetchTrafikverket(positionQuery());
+	const announcements = await fetchTrafikverket(
+		announcementQuery(
+			positions.TrainPosition.map(({ Train }) => Train.AdvertisedTrainNumber).join()
+		)
+	);
+	return { positions, announcements };
+};
 
 async function fetchTrafikverket(body) {
 	const response = await fetch(apiUrl, { method: 'POST', body, headers });
@@ -39,14 +44,14 @@ function positionQuery() {
 </REQUEST>`;
 }
 
-function announcementQuery() {
-	const since = new Date(Date.now() - 4 * minutes).toISOString();
+function announcementQuery(trains) {
+	const since = new Date(Date.now() - 8 * minutes).toISOString();
 	return `
 <REQUEST>
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />
     <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='true' schemaversion='1.6'>
       <FILTER>
-       	<LIKE name='AdvertisedTrainIdent' value='/^(?:2[2-9]\\d\\d|12[89]\\d\\d|52[2-7]\\d\\d)$/' />
+       	<IN name='AdvertisedTrainIdent' value='${trains}' />
         <GT name='TimeAtLocationWithSeconds' value='${since}' />
         <EXISTS name='ToLocation' value='true' />
       </FILTER>

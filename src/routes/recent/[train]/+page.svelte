@@ -1,6 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { groupAnnouncements, popupText, wgs84 } from '$lib/utils';
+	import { groupAnnouncements, popupText, wgs84, icon } from '$lib/utils';
 	import { differenceInSeconds } from 'date-fns';
 
 	let mapElement;
@@ -15,13 +15,7 @@
 	onMount(async () => {
 		const L = await import('leaflet');
 
-		let iconSize = {
-			iconSize: [32, 32],
-			iconAnchor: [16, 16],
-			popupAnchor: [0, -16]
-		};
-
-		function icon(position) {
+		function getHue(position) {
 			const d = differenceInSeconds(
 				announcements[position.Train.AdvertisedTrainNumber]?.TimeAtLocationWithSeconds,
 				announcements[position.Train.AdvertisedTrainNumber]?.AdvertisedTimeAtLocation
@@ -36,16 +30,7 @@
 			else if (d < 900) hue = 25;
 			else hue = 0;
 
-			const bearing = position.Bearing;
-
-			const black = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="black" stroke-width="10" />`;
-			const diamond = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" stroke-width="6" />`;
-			const g = `<g transform="translate(32,32) rotate(${bearing},0,0)">${black}${diamond}</g>`;
-			const svg = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
-			return L.icon({
-				...iconSize,
-				iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`
-			});
+			return hue;
 		}
 
 		map = L.map(mapElement).setView([58, 15], 6);
@@ -55,7 +40,7 @@
 
 		data.positions.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon: icon(position)
+				icon: L.icon(icon(position.Bearing, getHue(position)))
 			});
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));
@@ -71,11 +56,10 @@
 		}
 
 		function addPosition(position) {
-			console.log(position);
 			const marker = markers[position.Train.AdvertisedTrainNumber];
 			marker?.setLatLng(wgs84(position.Position.WGS84));
 			marker?.setPopupContent(popupText(position, announcements));
-			marker?.setIcon(icon(position));
+			marker?.setIcon(L.icon(icon(position.Bearing, getHue(position))));
 		}
 	});
 

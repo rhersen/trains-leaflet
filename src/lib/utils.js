@@ -43,3 +43,16 @@ export function code(position, announcements) {
 	const announcement = announcements[position.Train.AdvertisedTrainNumber];
 	return announcement ? announcement.ProductInformation.map((p) => p.Code).join(' ') : '';
 }
+
+export function icon(bearing, hue) {
+	const outlined = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="black" stroke-width="10" />`;
+	const filled = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" stroke-width="6" />`;
+	const g = `<g transform="translate(32,32) rotate(${bearing},0,0)">${outlined}${filled}</g>`;
+	const svg = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+	return {
+		iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`,
+		iconSize: [32, 32],
+		iconAnchor: [16, 16],
+		popupAnchor: [0, -16]
+	};
+}

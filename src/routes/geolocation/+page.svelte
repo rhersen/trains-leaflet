@@ -1,7 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { code, groupAnnouncements, popupText, wgs84 } from '$lib/utils';
-	import { createLeafletIcon } from '$lib/geolocation';
+	import { code, groupAnnouncements, popupText, wgs84, icon } from '$lib/utils';
 
 	let mapElement;
 	let map;
@@ -15,6 +14,17 @@
 	onMount(async () => {
 		const L = await import('leaflet');
 
+		function getColor(code) {
+			let hue = -1;
+			if (code === 'PNA014' || code === 'PNA040' || code === 'PNA041') hue = 240;
+			if (code === 'PNA065') hue = 0;
+			if (code === 'PNA038' || code === 'PNA098') hue = 60;
+			if (code === 'PNA021') hue = 30;
+			if (code === 'PNA023' || code === 'PNA025' || code === 'PNA026') hue = 120;
+			if (code.startsWith('PNA054') || code === 'PNA010' || code === 'PNA043') hue = 180;
+			return hue;
+		}
+
 		map = L.map(mapElement).setView([data.latitude ?? 58, data.longitude ?? 15], 11);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -22,7 +32,7 @@
 
 		data.positions.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon: createLeafletIcon(code(position, announcements), L)
+				icon: L.icon(icon(position.Bearing, getColor(code(position, announcements))))
 			});
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));
@@ -39,16 +49,9 @@
 
 		function addPosition(position) {
 			const marker = markers[position.Train.AdvertisedTrainNumber];
-			if (marker) {
-				marker?.setLatLng(wgs84(position.Position.WGS84));
-				marker?.setPopupContent(popupText(position, announcements));
-			} else {
-				const marker = L.marker(wgs84(position.Position.WGS84), {
-					icon: createLeafletIcon(code(position, announcements), L)
-				});
-				markers[position.Train.AdvertisedTrainNumber] = marker;
-				marker.addTo(map).bindPopup(popupText(position, announcements));
-			}
+			marker?.setLatLng(wgs84(position.Position.WGS84));
+			marker?.setPopupContent(popupText(position, announcements));
+			marker?.setIcon(L.icon(icon(position.Bearing, getColor(code(position, announcements)))));
 		}
 	});
 

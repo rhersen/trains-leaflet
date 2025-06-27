@@ -45,8 +45,8 @@ export function code(position, announcements) {
 }
 
 export function icon(bearing, hue) {
-	const outlined = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="black" stroke-width="10" />`;
-	const filled = `<polygon points="0,-18 10,20 -10,20" fill="none" stroke="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" stroke-width="6" />`;
+	const outlined = `<polygon points="0,-25 17.68,17.68 -17.68,17.68" fill="none" stroke="black" stroke-width="10" />`;
+	const filled = `<polygon points="0,-25 17.68,17.68 -17.68,17.68" fill="none" stroke="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" stroke-width="6" />`;
 	const g = `<g transform="translate(32,32) rotate(${bearing},0,0)">${outlined}${filled}</g>`;
 	const svg = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
 	return {

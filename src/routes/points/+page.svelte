@@ -5,16 +5,16 @@
 	let mapElement;
 	let map;
 	let positionSource;
-	let markers = {};
+	const markers = {};
 
 	export let data;
 
-	let announcements = groupAnnouncements(data.announcements);
+	const announcements = groupAnnouncements(data.announcements);
 
 	onMount(async () => {
 		const L = await import('leaflet');
 
-		let iconSize = {
+		const iconSize = {
 			iconSize: [32, 32],
 			iconAnchor: [16, 16],
 			popupAnchor: [0, -16]

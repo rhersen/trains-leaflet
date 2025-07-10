@@ -6,11 +6,11 @@
 	let mapElement;
 	let map;
 	let positionSource, announcementSource;
-	let markers = {};
+	const markers = {};
 
 	export let data;
 
-	let announcements = groupAnnouncements(data.announcements?.TrainAnnouncement ?? []);
+	const announcements = groupAnnouncements(data.announcements?.TrainAnnouncement ?? []);
 
 	function getHue(position) {
 		const d = differenceInSeconds(

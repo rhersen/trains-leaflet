@@ -30,7 +30,7 @@
 	onMount(async () => {
 		const L = await import('leaflet');
 
-		map = L.map(mapElement).setView([59.33, 18.07], 11);
+		map = L.map(mapElement).setView([59.33, 18.07], 9);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);

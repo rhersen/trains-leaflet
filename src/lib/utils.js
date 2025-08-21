@@ -26,7 +26,9 @@ export function popupText(position, announcements) {
 		: '';
 	const to = announcement ? '–' + announcement.ToLocation.map((l) => l.LocationName).join() : '';
 	const speed = position.Speed ? '<br>' + position.Speed + ' km/h' : '';
-	const prod = announcement ? announcement?.ProductInformation[0].Description + ' ' : '';
+	const prod = announcement?.ProductInformation
+		? announcement?.ProductInformation[0].Description + ' '
+		: '';
 	return prod + position.Train.AdvertisedTrainNumber + from + to + speed;
 }
 
@@ -41,7 +43,9 @@ export function wgs84(s) {
 
 export function code(position, announcements) {
 	const announcement = announcements[position.Train.AdvertisedTrainNumber];
-	return announcement ? announcement.ProductInformation.map((p) => p.Code).join(' ') : '';
+	return announcement?.ProductInformation
+		? announcement.ProductInformation.map((p) => p.Code).join(' ')
+		: '';
 }
 
 export function icon(bearing, hue) {

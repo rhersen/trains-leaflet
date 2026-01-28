@@ -85,7 +85,7 @@
 
 	async function fetchPositionsForTrain(trainId) {
 		const today = new Date().toLocaleDateString('sv-SE');
-		const response = await fetch(`http://trains.hersen.name/api/positions/${trainId}/${today}`);
+		const response = await fetch(`https://trains.hersen.name/api/positions/${trainId}/${today}`);
 		if (!response.ok) {
 			console.error('Failed to fetch train:', trainId, response.statusText);
 			return [];

@@ -1,4 +1,6 @@
-export function load({ url }) {
-	const train = url.searchParams.get('train');
-	return { train };
+export function load({ url, data }) {
+	return {
+		trains: url.searchParams.getAll('train'),
+		announcements: data.announcements
+	};
 }

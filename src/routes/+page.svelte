@@ -25,6 +25,7 @@
 	<li><a href="recent">senaste</a></li>
 	<li><a href="geolocation?{queryString}">geolocation</a></li>
 	<li><a href="track">track</a></li>
+	<li><a href="stations">stations</a></li>
 </ul>
 
 <style>

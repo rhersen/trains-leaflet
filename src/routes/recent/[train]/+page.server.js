@@ -61,14 +61,14 @@ function positionQuery(train) {
 </REQUEST>`;
 }
 
-function announcementQuery(idArray) {
+function announcementQuery(train) {
 	const since = new Date(Date.now() - 50 * minutes).toISOString();
 	return `
 <REQUEST>
   <LOGIN authenticationkey='${process.env.TRAFIKVERKET_API_KEY}' />
     <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' sseurl='false' schemaversion='1.6'>
       <FILTER>
-        <IN name='AdvertisedTrainIdent' value='${idArray}' />
+        <IN name='AdvertisedTrainIdent' value='${train}' />
         <GT name='TimeAtLocationWithSeconds' value='${since}' />
         <EXISTS name='ToLocation' value='true' />
       </FILTER>

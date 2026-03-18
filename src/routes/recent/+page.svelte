@@ -3,18 +3,15 @@
 
 	export let data;
 
-	// Function to format date string
-	function formatDateTime(dateString) {
-		return dateString.substring(11, 19);
+	function href({ AdvertisedTrainIdent, ScheduledDepartureDateTime }) {
+		return `recent/${AdvertisedTrainIdent}/${ScheduledDepartureDateTime.substring(0, 10)}`;
 	}
 
-	// Function to get descriptions from ProductInformation
 	function getDescriptions(productInfo) {
 		if (!productInfo || !Array.isArray(productInfo)) return '-';
 		return productInfo.map((p) => p.Description).join(' ');
 	}
 
-	// Function to get destination
 	function getDestination(toLocation) {
 		if (!toLocation || toLocation.length === 0) return '-';
 		return locations[toLocation[0].LocationName];
@@ -27,6 +24,7 @@
 			<tr>
 				<th>Description</th>
 				<th>Train ID</th>
+				<th>Date</th>
 				<th>Destination</th>
 				<th>Location</th>
 				<th>Actual Time</th>
@@ -41,9 +39,14 @@
 							{announcement.AdvertisedTrainIdent}
 						</a>
 					</td>
+					<td>
+						<a href={href(announcement)}>
+							{announcement.ScheduledDepartureDateTime.substring(0, 10)}
+						</a>
+					</td>
 					<td>{getDestination(announcement.ToLocation)}</td>
 					<td>{locations[announcement.LocationSignature]}</td>
-					<td>{formatDateTime(announcement.TimeAtLocationWithSeconds)}</td>
+					<td>{announcement.TimeAtLocationWithSeconds.substring(11, 19)}</td>
 				</tr>
 			{/each}
 		</tbody>

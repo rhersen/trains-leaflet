@@ -50,6 +50,7 @@ function getBody() {
                 <INCLUDE>AdvertisedTimeAtLocation</INCLUDE>
                 <INCLUDE>LocationSignature</INCLUDE>
                 <INCLUDE>ProductInformation</INCLUDE>
+                <INCLUDE>ScheduledDepartureDateTime</INCLUDE>
                 <INCLUDE>TimeAtLocation</INCLUDE>
                 <INCLUDE>TimeAtLocationWithSeconds</INCLUDE>
                 <INCLUDE>ToLocation</INCLUDE>

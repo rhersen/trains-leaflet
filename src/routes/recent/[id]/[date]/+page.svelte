@@ -1,16 +1,13 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { groupAnnouncements, popupText, wgs84, icon } from '$lib/utils';
+	import { circle, wgs84, icon } from '$lib/utils';
 	import { differenceInSeconds } from 'date-fns';
 
 	let mapElement;
 	let map;
 	let positionSource;
-	const markers = {};
 
 	export let data;
-
-	const announcements = groupAnnouncements(data.announcements);
 
 	onMount(async () => {
 		const L = await import('leaflet');
@@ -33,18 +30,23 @@
 			return hue;
 		}
 
+		const stationResult = await fetch('/stations');
+		const stations = await stationResult.json();
+
 		map = L.map(mapElement).setView([58, 15], 6);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
-		data.positions.forEach((position) => {
-			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon: L.icon(icon(position.Bearing, getHue(position)))
+		data.announcements
+			.map((announcement) => stations[announcement.LocationSignature]?.coordinates)
+			.forEach((coordinates) => {
+				L.marker(coordinates, {
+					icon: L.icon(circle(90))
+				}).addTo(map);
 			});
-			markers[position.Train.AdvertisedTrainNumber] = marker;
-			marker.addTo(map).bindPopup(popupText(position, announcements));
-		});
+
+		data.positions.forEach(addPosition);
 
 		if (data.ssePosition) {
 			positionSource = new EventSource(data.ssePosition);
@@ -56,10 +58,10 @@
 		}
 
 		function addPosition(position) {
-			const marker = markers[position.Train.AdvertisedTrainNumber];
-			marker?.setLatLng(wgs84(position.Position.WGS84));
-			marker?.setPopupContent(popupText(position, announcements));
-			marker?.setIcon(L.icon(icon(position.Bearing, getHue(position))));
+			const marker = L.marker(wgs84(position.Position.WGS84), {
+				icon: L.icon(icon(position.Bearing, 90))
+			});
+			marker.addTo(map); //.bindPopup(popupText(position, announcements));
 		}
 	});
 

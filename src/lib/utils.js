@@ -60,3 +60,16 @@ export function icon(bearing, hue) {
 		popupAnchor: [0, -16]
 	};
 }
+
+export function circle(hue) {
+	const outlined = `<circle cx="0" cy="0" r="15" fill="black" />`;
+	const filled = `<circle cx="0" cy="0" r="12" fill="hsl(${hue} ${hue === -1 ? '0%' : '100%'} 50%)" />`;
+	const g = `<g transform="translate(32,32)">${outlined}${filled}</g>`;
+	const svg = `<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+	return {
+		iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`,
+		iconSize: [24, 24],
+		iconAnchor: [12, 12],
+		popupAnchor: [0, -12]
+	};
+}

@@ -49,7 +49,6 @@ function announcementQuery(id, date) {
       <FILTER>
         <EQ name='AdvertisedTrainIdent' value='${id}' />
         <EQ name='ScheduledDepartureDateTime' value='${date}' />
-        <EXISTS name='ToLocation' value='true' />
       </FILTER>
       <INCLUDE>ActivityType</INCLUDE>
       <INCLUDE>AdvertisedTrainIdent</INCLUDE>

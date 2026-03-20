@@ -12,22 +12,18 @@
 	onMount(async () => {
 		const L = await import('leaflet');
 
-		function getHue(position) {
+		function announcementHue(announcement) {
 			const d = differenceInSeconds(
-				announcements[position.Train.AdvertisedTrainNumber]?.TimeAtLocationWithSeconds,
-				announcements[position.Train.AdvertisedTrainNumber]?.AdvertisedTimeAtLocation
+				announcement.TimeAtLocationWithSeconds,
+				announcement.AdvertisedTimeAtLocation
 			);
 
-			let hue;
-			if (isNaN(d)) hue = 120;
-			else if (d < 120) hue = 120;
-			else if (d < 180) hue = 75;
-			else if (d < 300) hue = 60;
-			else if (d < 600) hue = 33;
-			else if (d < 900) hue = 25;
-			else hue = 0;
+			if (isNaN(d)) return 120;
+			if (d <= 120) return 120;
+			if (d >= 900) return 0;
 
-			return hue;
+			const t = (d - 120) / (900 - 120);
+			return Math.round(120 * (1 - t));
 		}
 
 		const stationResult = await fetch('/stations');
@@ -38,13 +34,13 @@
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
-		data.announcements
-			.map((announcement) => stations[announcement.LocationSignature]?.coordinates)
-			.forEach((coordinates) => {
-				L.marker(coordinates, {
-					icon: L.icon(circle(90))
-				}).addTo(map);
-			});
+		data.announcements.forEach((announcement) => {
+			const { coordinates } = stations[announcement.LocationSignature];
+			if (!coordinates) return;
+			L.marker(coordinates, {
+				icon: L.icon(circle(announcementHue(announcement)))
+			}).addTo(map);
+		});
 
 		data.positions.forEach(addPosition);
 

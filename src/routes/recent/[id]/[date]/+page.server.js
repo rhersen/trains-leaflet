@@ -51,6 +51,7 @@ function announcementQuery(id, date) {
         <EQ name='ScheduledDepartureDateTime' value='${date}' />
       </FILTER>
       <INCLUDE>ActivityType</INCLUDE>
+      <INCLUDE>AdvertisedTimeAtLocation</INCLUDE>
       <INCLUDE>AdvertisedTrainIdent</INCLUDE>
       <INCLUDE>FromLocation</INCLUDE>
       <INCLUDE>LocationSignature</INCLUDE>

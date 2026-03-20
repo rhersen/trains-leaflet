@@ -13,12 +13,14 @@
 		const L = await import('leaflet');
 
 		function announcementHue(announcement) {
+			if (!announcement.TimeAtLocationWithSeconds) return -1;
+
 			const d = differenceInSeconds(
 				announcement.TimeAtLocationWithSeconds,
 				announcement.AdvertisedTimeAtLocation
 			);
 
-			if (isNaN(d)) return 120;
+			if (isNaN(d)) return -1;
 			if (d <= 120) return 120;
 			if (d >= 900) return 0;
 

@@ -36,6 +36,25 @@
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		L.tileLayer('https://c.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png').addTo(map);
 
+		const announcementsWithCoordinates = data.announcements
+			.map((announcement) => ({
+				announcement,
+				coordinates: stations[announcement.LocationSignature]?.coordinates
+			}))
+			.filter(({ coordinates }) => Array.isArray(coordinates));
+
+		for (let i = 1; i < announcementsWithCoordinates.length; i += 1) {
+			const curr = announcementsWithCoordinates[i];
+			const prev = announcementsWithCoordinates[i - 1];
+			const from = prev.coordinates;
+			const to = curr.coordinates;
+			const hue = announcementHue(curr.announcement);
+			const color = `hsl(${hue === -1 ? 0 : hue} ${hue === -1 ? '0%' : '100%'} 50%)`;
+
+			L.polyline([from, to], { color: '#111', weight: 7, opacity: 0.9 }).addTo(map);
+			L.polyline([from, to], { color, weight: 4, opacity: 0.95 }).addTo(map);
+		}
+
 		data.announcements.forEach((announcement) => {
 			const { coordinates } = stations[announcement.LocationSignature];
 			if (!coordinates) return;

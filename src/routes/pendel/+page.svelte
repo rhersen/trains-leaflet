@@ -14,28 +14,20 @@
 
 	const announcements = groupAnnouncements(data.announcements?.TrainAnnouncement ?? []);
 
+	function trainColor(trainNumber) {
+		const lastDigit = Number(String(trainNumber).at(-1));
+		const hues = lastDigit % 2 === 0 ? [320, 340, 0, 20, 40] : [170, 190, 215, 240, 260];
+		return `hsl(${hues[Math.floor(lastDigit / 2)]}, 100%, 70%)`;
+	}
+
 	function circleIcon(L, position) {
+		const trainNumber = position.Train.AdvertisedTrainNumber;
 		return L.divIcon({
 			className: '',
-			html: `<div style="width: 16px; height: 16px; box-sizing: border-box; border: 2px solid white; border-radius: 50%; background: #c026d3; box-shadow: 0 1px 4px rgb(0 0 0 / 45%);"></div>`,
+			html: `<div style="width: 16px; height: 16px; box-sizing: border-box; border: 2px solid black; border-radius: 50%; background: ${trainColor(trainNumber)}; box-shadow: 0 1px 4px rgb(0 0 0 / 45%);"></div>`,
 			iconSize: [16, 16],
 			iconAnchor: [8, 8]
 		});
-	}
-
-	function getHue(position) {
-		const d = differenceInSeconds(
-			announcements[position.Train.AdvertisedTrainNumber]?.TimeAtLocationWithSeconds,
-			announcements[position.Train.AdvertisedTrainNumber]?.AdvertisedTimeAtLocation
-		);
-
-		if (isNaN(d)) return -1;
-		else if (d < 120) return 120;
-		else if (d < 180) return 75;
-		else if (d < 300) return 60;
-		else if (d < 600) return 33;
-		else if (d < 900) return 25;
-		else return 0;
 	}
 
 	onMount(async () => {
@@ -89,7 +81,7 @@
 
 			const tailCoordinates = previousPositions[trainNumber].map(({ coordinate }) => coordinate);
 			if (tailCoordinates.length > 1) {
-				const color = '#c026d3';
+				const color = trainColor(trainNumber);
 				if (tails[trainNumber]) {
 					tails[trainNumber].outline.setLatLngs(tailCoordinates);
 					tails[trainNumber].line.setLatLngs(tailCoordinates);
@@ -97,7 +89,7 @@
 				} else {
 					tails[trainNumber] = {
 						outline: L.polyline(tailCoordinates, {
-							color: 'white',
+							color: 'black',
 							weight: 10
 						}).addTo(map),
 						line: L.polyline(tailCoordinates, {

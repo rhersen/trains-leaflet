@@ -1,16 +1,27 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { groupAnnouncements, popupText, wgs84, icon } from '$lib/utils';
+	import { groupAnnouncements, popupText, wgs84 } from '$lib/utils';
 	import { differenceInSeconds } from 'date-fns';
 
 	let mapElement;
 	let map;
 	let positionSource, announcementSource;
 	const markers = {};
+	const previousPositions = {};
+	const tails = {};
 
 	export let data;
 
 	const announcements = groupAnnouncements(data.announcements?.TrainAnnouncement ?? []);
+
+	function circleIcon(L, position) {
+		return L.divIcon({
+			className: '',
+			html: `<div style="width: 16px; height: 16px; box-sizing: border-box; border: 2px solid white; border-radius: 50%; background: #c026d3; box-shadow: 0 1px 4px rgb(0 0 0 / 45%);"></div>`,
+			iconSize: [16, 16],
+			iconAnchor: [8, 8]
+		});
+	}
 
 	function getHue(position) {
 		const d = differenceInSeconds(
@@ -37,7 +48,7 @@
 
 		data.positions.TrainPosition.forEach((position) => {
 			const marker = L.marker(wgs84(position.Position.WGS84), {
-				icon: L.icon(icon(position.Bearing, getHue(position)))
+				icon: circleIcon(L, position)
 			});
 			markers[position.Train.AdvertisedTrainNumber] = marker;
 			marker.addTo(map).bindPopup(popupText(position, announcements));
@@ -66,14 +77,41 @@
 
 		function addPosition(position) {
 			const trainNumber = position.Train.AdvertisedTrainNumber;
+			const currentPosition = wgs84(position.Position.WGS84);
+			const positions = previousPositions[trainNumber] ?? [];
 			const marker = markers[trainNumber];
+
+			positions.push(currentPosition);
+			if (positions.length > 4) positions.shift();
+			previousPositions[trainNumber] = positions;
+
+			if (positions.length > 1) {
+				const color = '#c026d3';
+				if (tails[trainNumber]) {
+					tails[trainNumber].outline.setLatLngs(positions);
+					tails[trainNumber].line.setLatLngs(positions);
+					tails[trainNumber].line.setStyle({ color });
+				} else {
+					tails[trainNumber] = {
+						outline: L.polyline(positions, {
+							color: 'white',
+							weight: 8
+						}).addTo(map),
+						line: L.polyline(positions, {
+							color,
+							weight: 6
+						}).addTo(map)
+					};
+				}
+			}
+
 			if (marker) {
-				marker.setLatLng(wgs84(position.Position.WGS84));
+				marker.setLatLng(currentPosition);
 				marker.setPopupContent(popupText(position, announcements));
-				marker.setIcon(L.icon(icon(position.Bearing, getHue(position))));
+				marker.setIcon(circleIcon(L, position));
 			} else {
-				markers[trainNumber] = L.marker(wgs84(position.Position.WGS84), {
-					icon: L.icon(icon(position.Bearing, getHue(position)))
+				markers[trainNumber] = L.marker(currentPosition, {
+					icon: circleIcon(L, position)
 				});
 				markers[trainNumber].addTo(map).bindPopup(popupText(position, announcements));
 			}

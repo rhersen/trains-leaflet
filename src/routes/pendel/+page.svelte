@@ -80,24 +80,27 @@
 			const currentPosition = wgs84(position.Position.WGS84);
 			const positions = previousPositions[trainNumber] ?? [];
 			const marker = markers[trainNumber];
+			const timestamp = new Date(position.TimeStamp).getTime();
 
-			positions.push(currentPosition);
-			if (positions.length > 4) positions.shift();
-			previousPositions[trainNumber] = positions;
+			positions.push({ coordinate: currentPosition, timestamp });
+			previousPositions[trainNumber] = positions.filter(
+				({ timestamp: positionTimestamp }) => timestamp - positionTimestamp <= 60_000
+			);
 
-			if (positions.length > 1) {
+			const tailCoordinates = previousPositions[trainNumber].map(({ coordinate }) => coordinate);
+			if (tailCoordinates.length > 1) {
 				const color = '#c026d3';
 				if (tails[trainNumber]) {
-					tails[trainNumber].outline.setLatLngs(positions);
-					tails[trainNumber].line.setLatLngs(positions);
+					tails[trainNumber].outline.setLatLngs(tailCoordinates);
+					tails[trainNumber].line.setLatLngs(tailCoordinates);
 					tails[trainNumber].line.setStyle({ color });
 				} else {
 					tails[trainNumber] = {
-						outline: L.polyline(positions, {
+						outline: L.polyline(tailCoordinates, {
 							color: 'white',
-							weight: 8
+							weight: 10
 						}).addTo(map),
-						line: L.polyline(positions, {
+						line: L.polyline(tailCoordinates, {
 							color,
 							weight: 6
 						}).addTo(map)
